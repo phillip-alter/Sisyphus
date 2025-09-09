@@ -22,6 +22,7 @@
         "CANCEL",
         "Settings",
         "SlashCmdList",
-        "hash_SlashCmdList"
+        "hash_SlashCmdList",
+        "UISpecialFrames"
     ]
 }
