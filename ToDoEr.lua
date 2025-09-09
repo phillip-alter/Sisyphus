@@ -85,16 +85,16 @@ end)
 --- up arrow to move up on list
 --- down arrow to move down on list 
 
-local function AddItem()
+local function AddItem(text)
     -- add checkbox 
     -- add text box
-    -- add task # and text to db
+    -- add task id and text to db
     -- add delete button
     -- add up arrow
     -- add down arrow
 end
 
-local function RemoveItem()
+local function RemoveItem(id)
     -- remove item from pinned list
     -- remove item from db
     -- update frame
