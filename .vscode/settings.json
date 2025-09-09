@@ -34,5 +34,6 @@
         "IsSecureCmd",
         "NUM_CHAT_WINDOWS",
         "ChatEdit_GetActiveWindow"
-    ]
+    ],
+    "Lua.type.weakUnionCheck": true
 }
