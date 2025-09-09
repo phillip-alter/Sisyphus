@@ -1,6 +1,11 @@
 ---
 --- DB Creation
 ---
+--- db:
+--- item number (for ordering on list)
+--- text
+--- t/f on whether the checkbox is checked
+--- the last time it was checked
 
 if not ToDoErDB then
     ToDoErDB = {}
@@ -128,15 +133,6 @@ local function NewWeeklyReset()
     -- compare dates of checks to set time (Tuesday at 9 AM PT)
     -- uncheck weekly checkboxes
 end
-
-
-
---- db:
---- item number (for ordering on list)
---- text
---- t/f on whether the checkbox is checked
---- the last time it was checked
-
 
 ---
 --- Slash Commands
