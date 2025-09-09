@@ -76,6 +76,7 @@ addButton:SetScript("OnEnter", function(self)
 end)
 
 
+
 -- Frame for displaying tasks
 --- each item in frame:
 --- checkbox (may or may not slash-through)
@@ -135,7 +136,6 @@ end
 --- text
 --- t/f on whether the checkbox is checked
 --- the last time it was checked
-
 
 
 ---
