@@ -63,12 +63,4 @@ SlashCmdList["TODOER"] = function()
     end
 end
 
-function ToDoEr:ToggleListFrame()
-    if not listFrame:IsShown() then
-        listFrame:Show()
-    else
-        listFrame:Hide()
-    end
-end
-
 table.insert(UISpecialFrames, "ToDoErFrame")
