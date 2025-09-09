@@ -6,7 +6,9 @@ if not ToDoErDB then
     ToDoErDB = {}
 end
 
-ToDoEr = ToDoEr or {}
+if not ToDoErGlobalDB then
+    ToDoErGlobalDB = {}
+end
 
 ---
 --- Init Text 
@@ -48,7 +50,10 @@ local addButton = CreateFrame("Button","ToDoErAddButton",listFrame, "UIPanelButt
 addButton:SetSize(100,30)
 addButton:SetPoint("TOPLEFT",listFrame.player,"TOPLEFT",0,-15)
 addButton:SetText("Add Task")
-
+addButton:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self,"ANCHOR_RIGHT")
+    GameTooltip:SetText("Add a task to this character.",nil,nil,nil,nil,true)
+end)
 ---
 --- Slash Commands
 ---
