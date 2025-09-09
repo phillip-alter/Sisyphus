@@ -30,6 +30,14 @@ listFrame:SetScript("OnDragStop",function(self)
     self:StopMovingOrSizing()
 end)
 
+listFrame.player = listFrame:CreateFontString(nil,"OVERLAY","GameFontNormal")
+listFrame.player:SetPoint("TOPLEFT",listFrame,"TOPLEFT",15,-35)
+listFrame.player:SetText("Character: " .. UnitName("player") .. " (Level " .. UnitLevel("player") .. ")")
+local addButton = CreateFrame("Button","ToDoErAddButton",listFrame, "ButtonFrameTemplate")
+addButton:SetSize(20,20)
+addButton:SetPoint("TOPLEFT",listFrame,"TOPLEFT",0,-6)
+
+
 SLASH_TODOER1 = "/todoer"
 SLASH_TODOER2 = "/tde"
 SlashCmdList["TODOER"] = function()
