@@ -5,7 +5,7 @@
 ## Version: 0.1.0
 ## RequiredDeps:
 ## X-Curse-Project-ID: 999999
-## SavedVariables:
+## SavedVariables: ToDoErGlobalDB
 ## SavedVariablesPerCharacter: ToDoErDB
 # Libs
 Libs/Ace3/AceAddon-3.0/AceAddon-3.0.lua
