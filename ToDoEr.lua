@@ -9,6 +9,12 @@ end
 ToDoEr = ToDoEr or {}
 
 ---
+--- Init Text 
+---
+
+print("To Do 'Er initialized. Used /todoer or /tde to open menu.")
+
+---
 --- Frame Creation
 --- 
 
@@ -66,40 +72,3 @@ function ToDoEr:ToggleListFrame()
 end
 
 table.insert(UISpecialFrames, "ToDoErFrame")
-
----
---- Minimap Button
----
-
-local addon = LibStub("AceAddon-3.0"):NewAddon("ToDoEr")
-ToDoErMinimapButton = LibStub("LibDBIcon-1.0",true)
-
-local minibutton = LibStub("LibDataBroker-1.1"):NewDataObject("ToDoEr",{
-    type = "data source",
-    text = "ToDoEr",
-    icon = "Interface\\Addons\\ToDoEr\\minimap.tga",
-    OnClick = function(self,btn)
-        if btn == "LeftButton" then
-            ToDoEr:ToggleListFrame()
-        end
-    end,
-    OnTooltipShow = function(tooltip)
-        if not tooltip or not tooltip.AddLine then
-            return
-        end
-        tooltip:AddLine("ToDoEr\n\nLeft-Click: Open ToDoEr",nil,nil,nil,nil)
-    end,
-})
-
-function addon:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New("ToDoErMinimapPOS",{
-        profile = {
-            minimap = {
-                hide = false,
-            },
-        },
-    })
-    ToDoErMinimapButton:Register("ToDoEr",minibutton,self.db.profile.minimap)
-end
-
---ToDoErMinimapButton:Show("ToDoEr")
