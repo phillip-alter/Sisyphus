@@ -13,7 +13,7 @@ ToDoEr = ToDoEr or {}
 --- 
 
 local listFrame = CreateFrame("Frame","ToDoErFrame",UIParent,"BasicFrameTemplateWithInset")
-listFrame:SetSize(350,700)
+listFrame:SetSize(350,500)
 listFrame:SetPoint("CENTER",UIParent,"CENTER",0,0)
 listFrame.TitleBg:SetHeight(30)
 listFrame.title = listFrame:CreateFontString(nil,"OVERLAY","GameFontHighlight")
@@ -33,10 +33,19 @@ end)
 listFrame.player = listFrame:CreateFontString(nil,"OVERLAY","GameFontNormal")
 listFrame.player:SetPoint("TOPLEFT",listFrame,"TOPLEFT",15,-35)
 listFrame.player:SetText("Character: " .. UnitName("player") .. " (Level " .. UnitLevel("player") .. ")")
-local addButton = CreateFrame("Button","ToDoErAddButton",listFrame, "ButtonFrameTemplate")
-addButton:SetSize(20,20)
-addButton:SetPoint("TOPLEFT",listFrame,"TOPLEFT",0,-6)
 
+---
+--- Button to Add Tasks
+---
+
+local addButton = CreateFrame("Button","ToDoErAddButton",listFrame, "UIPanelButtonTemplate")
+addButton:SetSize(100,30)
+addButton:SetPoint("TOPLEFT",listFrame.player,"TOPLEFT",0,-15)
+addButton:SetText("Add Task")
+
+---
+--- Slash Commands
+---
 
 SLASH_TODOER1 = "/todoer"
 SLASH_TODOER2 = "/tde"
@@ -56,7 +65,7 @@ function ToDoEr:ToggleListFrame()
     end
 end
 
-table.insert(UISpecialFrames, "MyAddonMainFrame")
+table.insert(UISpecialFrames, "ToDoErFrame")
 
 ---
 --- Minimap Button
