@@ -23,6 +23,16 @@
         "Settings",
         "SlashCmdList",
         "hash_SlashCmdList",
-        "UISpecialFrames"
+        "UISpecialFrames",
+        "ReloadUI",
+        "NORMAL_FONT_COLOR_CODE",
+        "FONT_COLOR_CODE_CLOSE",
+        "CLOSE",
+        "SetDesaturation",
+        "ColorPickerFrame",
+        "NOT_BOUND",
+        "IsSecureCmd",
+        "NUM_CHAT_WINDOWS",
+        "ChatEdit_GetActiveWindow"
     ]
 }
