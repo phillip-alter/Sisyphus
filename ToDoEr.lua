@@ -23,7 +23,7 @@ listFrame:Hide()
 listFrame:EnableMouse(true)
 listFrame:SetMovable(true)
 listFrame:RegisterForDrag("LeftButton")
-listFrame:SetScript("OnDragStrat",function(self)
+listFrame:SetScript("OnDragStart",function(self)
     self:StartMoving()
 end)
 listFrame:SetScript("OnDragStop",function(self)
@@ -37,6 +37,14 @@ SlashCmdList["TODOER"] = function()
         listFrame:Hide()
     else
         listFrame:Show()
+    end
+end
+
+function ToDoEr:ToggleListFrame()
+    if not listFrame:IsShown() then
+        listFrame:Show()
+    else
+        listFrame:Hide()
     end
 end
 
@@ -55,7 +63,7 @@ local minibutton = LibStub("LibDataBroker-1.1"):NewDataObject("ToDoEr",{
     icon = "Interface\\Addons\\ToDoEr\\minimap.tga",
     OnClick = function(self,btn)
         if btn == "LeftButton" then
-            ToDoEr:ToggleMainFrame()
+            ToDoEr:ToggleListFrame()
         end
     end,
     OnTooltipShow = function(tooltip)
