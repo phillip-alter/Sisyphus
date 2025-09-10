@@ -1,8 +1,8 @@
 ## Interface: 110200
-## Title: ToDo 'Er
+## Title: ToDoEr
 ## Notes: A to-do list for your character.
 ## Author: CeedTheMediocre
-## Version: 0.1.0
+## Version: 1.0.0
 ## RequiredDeps:
 ## X-Curse-Project-ID: 999999
 ## SavedVariables: ToDoErGlobalDB
