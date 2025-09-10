@@ -295,6 +295,14 @@ end
 --     -- uncheck weekly checkboxes
 -- end
 
+---TODO:
+--- * scroll bar for more tasks
+--- * variable width/height?
+--- * add checkbox for daily/weekly
+--- * implement account-wide list
+--- ** possibly separate by categories
+--- * chillax for a min, idk
+
 --eventframe to update list when the addon is fully loaded
 local eventHandlerFrame = CreateFrame("Frame")
 eventHandlerFrame:RegisterEvent("ADDON_LOADED")
