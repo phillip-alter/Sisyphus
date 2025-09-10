@@ -90,10 +90,11 @@ end)
 --- up arrow to move up on list
 --- down arrow to move down on list 
 
-local function AddItem(text)
+local function AddItem(text,isGlobal)
     -- add checkbox 
     -- add text box
-    -- add task id and text to db
+    -- determine whether account-wide or local
+    -- add task id and text to correct db
     -- add delete button
     -- add up arrow
     -- add down arrow
