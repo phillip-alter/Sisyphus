@@ -6,7 +6,7 @@
 ## RequiredDeps:
 ## X-Curse-Project-ID: 999999
 ## SavedVariables: ToDoErGlobalDB
-## SavedVariablesPerCharacter: ToDoErDB, DisplayHide
+## SavedVariablesPerCharacter: ToDoErDB
 # Libs
 Libs/Ace3/AceAddon-3.0/AceAddon-3.0.lua
 Libs/Ace3/AceDB-3.0/AceDB-3.0.lua

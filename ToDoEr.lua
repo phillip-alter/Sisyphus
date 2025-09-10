@@ -11,8 +11,8 @@ if not ToDoErDB then
     ToDoErDB = {}
 end
 
-if not DisplayHide then
-    DisplayHide = false;
+if ToDoErGlobalDB.DisplayHide == nil then
+    ToDoErGlobalDB.DisplayHide = false
 end
 
 if not ToDoErGlobalDB then
@@ -98,7 +98,9 @@ displayFrame:EnableMouse(true)
 displayFrame:SetMovable(true)
 displayFrame:SetResizable(true)
 displayFrame:SetAlpha(0.33)
-if DisplayHide then
+if not DisplayHide then
+    displayFrame:Show()
+else 
     displayFrame:Hide()
 end
 displayFrame:RegisterForDrag("LeftButton")
@@ -117,10 +119,10 @@ showButton:SetText("Show/Hide List")
 showButton:SetScript("OnClick", function()
     if not displayFrame:IsShown() then
         displayFrame:Show()
-        DisplayHide = false;
+        ToDoErGlobalDB.DisplayHide = false;
     else 
         displayFrame:Hide()
-        DisplayHide = true;
+        ToDoErGlobalDB.DisplayHide = true;
     end
 end)
 
