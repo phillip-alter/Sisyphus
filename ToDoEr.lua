@@ -1,11 +1,11 @@
+--- ToDoEr
+--- A simple task list creator for your character(s)
+--- by CeedTheMediocre
+--- https://twitch.tv/CeedTheMediocre
+
 ---
---- DB Creation
+--- DB Creation/Verification
 ---
---- db:
---- item number (for ordering on list)
---- text
---- t/f on whether the checkbox is checked
---- the last time it was checked
 
 if not ToDoErDB then
     ToDoErDB = {}
@@ -442,12 +442,6 @@ SlashCmdList["TODOER"] = function(msg)
         end
     end
 end
-
--- SLASH_TODOERRESET1 = "/tdereset"
--- SlashCmdList["TODOERRESET"] = function()
---     ToDoErDB = {}
---     UpdateList()
--- end
 
 SLASH_TODOREWINDWEEK1 = "/tderewind"
 SlashCmdList["TODOREWINDWEEK"] = function(msg)
