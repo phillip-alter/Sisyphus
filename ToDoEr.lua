@@ -121,7 +121,7 @@ displayFrame:SetPoint("TOPLEFT",UIParent,"TOPLEFT",0,-150)
 displayFrame.TitleBg:SetHeight(30)
 displayFrame.title = displayFrame:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall")
 displayFrame.title:SetPoint("TOPLEFT",displayFrame.TitleBg,"TOPLEFT",5,-3)
-displayFrame.title:SetText("Tasks")
+displayFrame.title:SetText("Tasks for " .. UnitName("player"))
 displayFrame:EnableMouse(true)
 displayFrame:SetMovable(true)
 if ToDoErDB.IsHidden == true then
@@ -211,7 +211,13 @@ function UpdateList()
         if checkBox:GetChecked() then
             text:SetTextColor(0.5,0.5,0.5)
         else 
-            text:SetTextColor(1,0.82,0)
+            if taskData.daily then 
+                text:SetTextColor(0.1,0.8,0.1)
+            elseif taskData.weekly then
+                text:SetTextColor(0.8,0.1,0.8)
+            else 
+                text:SetTextColor(1,0.82,0)
+            end
         end
 
         checkBox:SetScript("OnClick", function(self)
@@ -221,7 +227,13 @@ function UpdateList()
             if self:GetChecked() then
                 text:SetTextColor(0.5,0.5,0.5)
             else 
-                text:SetTextColor(1,0.82,0)
+                if taskData.daily then 
+                    text:SetTextColor(0.1,0.8,0.1)
+                elseif taskData.weekly then
+                    text:SetTextColor(0.8,0.1,0.8)
+                else 
+                    text:SetTextColor(1,0.82,0)
+                end
             end
             --testing purposes
             --print("Task '" .. taskData.text .. "' checked status is now: " .. tostring(taskData.checked))
@@ -262,7 +274,6 @@ function UpdateList()
         moveUpButton:SetScript("OnEnter", function()
             displayFrame:SetAlpha(1)
         end)
-
         -- add the row to tracking table and set it as the new anchor for the *next* row in the loop
         table.insert(displayFrame.taskRows, row)
         anchor = row
@@ -360,17 +371,12 @@ end
 --eventframe 
 local eventHandlerFrame = CreateFrame("Frame")
 eventHandlerFrame:RegisterEvent("ADDON_LOADED")
-eventHandlerFrame:RegisterEvent("PLAYER_LOGIN")
 eventHandlerFrame:SetScript("OnEvent", function(self, event, addonName)
     if addonName == "ToDoEr" then 
         print("ToDoEr has loaded. Drawing initial list.")
+        DailyCheckReset()
         UpdateList()
         self:UnregisterEvent("ADDON_LOADED")
-    end
-    if event == "PLAYER_LOGIN" then
-        DailyCheckReset()
-        print("(tde) Login. curr hour: " .. tonumber(date("!%H",GetServerTime())))
-        --WeeklyCheckReset()
     end
 end)
 
@@ -392,6 +398,12 @@ SLASH_TODOERRESET1 = "/tdereset"
 SlashCmdList["TODOERRESET"] = function()
     ToDoErDB = {}
     UpdateList()
+end
+
+SLASH_TODOREWIND1 = "/tderewindday"
+SlashCmdList["TODOREWIND"] = function()
+    ToDoErDB.lastResetDayUTC = ToDoErDB.lastResetDayUTC - 1
+    print("Rewound day! New day is : " .. ToDoErDB.lastResetDayUTC)
 end
 
 ---
