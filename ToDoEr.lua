@@ -88,7 +88,6 @@ end)
 --- down arrow to move down on list 
 
 local displayFrame = CreateFrame("Frame","ListDisplayFrame",UIParent,"BasicFrameTemplateWithInset")
---displayFrame:SetSize(250,500)
 displayFrame:SetWidth(250)
 displayFrame:SetHeight(300)
 displayFrame:SetPoint("TOPLEFT",UIParent,"TOPLEFT",0,-150)
