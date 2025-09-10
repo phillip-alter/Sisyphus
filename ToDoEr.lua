@@ -84,7 +84,9 @@ end)
 --- down arrow to move down on list 
 
 local displayFrame = CreateFrame("Frame","ListDisplayFrame",UIParent,"BasicFrameTemplateWithInset")
-displayFrame:SetSize(200,250)
+--displayFrame:SetSize(250,500)
+displayFrame:SetWidth(250)
+displayFrame:SetHeight(300)
 displayFrame:SetPoint("TOPLEFT",UIParent,"TOPLEFT",0,-150)
 displayFrame.TitleBg:SetHeight(30)
 displayFrame.title = displayFrame:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall")
@@ -92,7 +94,7 @@ displayFrame.title:SetPoint("TOPLEFT",displayFrame.TitleBg,"TOPLEFT",5,-3)
 displayFrame.title:SetText("Tasks")
 displayFrame:EnableMouse(true)
 displayFrame:SetMovable(true)
-displayFrame:SetResizable(true)
+--displayFrame:SetResizable(true)
 displayFrame:SetAlpha(0.33)
 displayFrame:RegisterForDrag("LeftButton")
 displayFrame:SetScript("OnDragStart",function(self)
@@ -128,6 +130,7 @@ function UpdateList()
         -- hide the frame so the game can clean it up
         row:Hide() 
     end
+
     -- reset our tracking table
     displayFrame.taskRows = {} 
 
@@ -167,14 +170,37 @@ function UpdateList()
         deleteButton:SetPoint("RIGHT", -5, 0)
         deleteButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up")
         deleteButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down")
-        deleteButton:SetHighlightTexture("Interface\\Buttons\\UI-Panel-Highlight")
         deleteButton:SetScript("OnClick", function()
             RemoveItem(i) 
         end)
-        deleteButton:SetScript("OnEnter",function()
+        deleteButton:SetScript("OnEnter", function()
             displayFrame:SetAlpha(1)
         end)
-        
+
+        local moveDownButton = CreateFrame("Button", "ToDoErDownButton" .. i, row)
+        moveDownButton:SetSize(20, 20)
+        moveDownButton:SetPoint("RIGHT", deleteButton, "LEFT", 0, 0) 
+        moveDownButton:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
+        moveDownButton:SetPushedTexture("Interface\\Buttons\\UI-MinusButton-Down")
+        moveDownButton:SetScript("OnClick", function()
+            MoveDown(i)
+        end)
+        moveDownButton:SetScript("OnEnter", function()
+            displayFrame:SetAlpha(1)
+        end)
+
+        local moveUpButton = CreateFrame("Button", "ToDoErUpButton" .. i, row)
+        moveUpButton:SetSize(20, 20)
+        moveUpButton:SetPoint("RIGHT", moveDownButton, "LEFT", 0, 0) 
+        moveUpButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
+        moveUpButton:SetPushedTexture("Interface\\Buttons\\UI-PlusButton-Down")
+        moveUpButton:SetScript("OnClick", function()
+            MoveUp(i)
+        end)
+        moveUpButton:SetScript("OnEnter", function()
+            displayFrame:SetAlpha(1)
+        end)
+
         -- add the row to our tracking table and set it as the new anchor for the *next* row in the loop
         table.insert(displayFrame.taskRows, row)
         anchor = row
@@ -200,14 +226,22 @@ function RemoveItem(id)
     UpdateList()
 end
 
-function MoveUp()
-    -- swap this item and previous item, ie swap [1] for [0]
-    -- update frame
+function MoveUp(id)
+    if id and id ~= 1 then
+        local temp = ToDoErDB[id-1]
+        ToDoErDB[id-1] = ToDoErDB[id]
+        ToDoErDB[id] = temp
+    end
+    UpdateList()
 end
 
-function MoveDown()
-    -- swap this item and next item, ie swap [0] for [1]
-    -- update frame
+function MoveDown(id)
+    if id and id ~= table.maxn(ToDoErDB) then
+        local temp = ToDoErDB[id+1]
+        ToDoErDB[id+1] = ToDoErDB[id]
+        ToDoErDB[id] = temp
+    end
+    UpdateList()
 end
 
 function UnCheckAll()
