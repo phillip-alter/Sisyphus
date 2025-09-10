@@ -55,7 +55,7 @@ local textBox = CreateFrame("EditBox","TextAdd",listFrame,"InputBoxTemplate")
 textBox:SetSize(275,35)
 textBox:SetPoint("CENTER",listFrame.player,"TOP",0,-35)
 textBox:SetMovable(false)
-textBox:SetMaxLetters(255)
+textBox:SetMaxLetters(15)
 textBox:SetAutoFocus(false)
 
 
@@ -101,7 +101,13 @@ end)
 displayFrame:SetScript("OnDragStop",function(self)
     self:StopMovingOrSizing()
 end)
-
+displayFrame:SetScript("OnEnter",function(self)
+    self:SetAlpha(1)
+end)
+displayFrame:SetScript("OnLeave",function(self)
+    self:SetAlpha(0.33)
+end)
+displayFrame.taskRows = {}
 
 local showButton = CreateFrame("Button","ToDoErShowButton",listFrame, "UIPanelButtonTemplate")
 showButton:SetSize(110,30)
@@ -110,15 +116,70 @@ showButton:SetText("Show/Hide List")
 showButton:SetScript("OnClick", function()
     if not displayFrame:IsShown() then
         displayFrame:Show()
+        UpdateList()
     else 
         displayFrame:Hide()
     end
 end)
 
 function UpdateList()
-    --todo 
-end
+    -- clear any old task rows that are currently displayed
+    for i, row in ipairs(displayFrame.taskRows) do
+        -- hide the frame so the game can clean it up
+        row:Hide() 
+    end
+    -- reset our tracking table
+    displayFrame.taskRows = {} 
 
+    --this is the UI element we will anchor the top of our list to.
+    local anchor = displayFrame.TitleBg
+
+    -- loop through our database and create a UI row for each task
+    for i, taskData in ipairs(ToDoErDB) do
+        local row = CreateFrame("Frame", "ToDoErTaskRow" .. i, displayFrame)
+        row:SetSize(displayFrame:GetWidth() - 20, 25) 
+        
+        -- anchor the very first row to the title, and every row after that to the one that came before it.
+        row:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -5)
+
+        local checkBox = CreateFrame("CheckButton", "ToDoErCheckBox" .. i, row, "UICheckButtonTemplate")
+        checkBox:SetSize(25, 25)
+        checkBox:SetPoint("LEFT", 5, 0)
+        checkBox:SetChecked(taskData.checked)
+        checkBox:SetScript("OnClick", function(self)
+            -- when clicked, update the data in the database
+            taskData.checked = self:GetChecked()
+            taskData.lastChecked = time() -- current time
+            --testing purposes
+            --print("Task '" .. taskData.text .. "' checked status is now: " .. tostring(taskData.checked))
+        end)
+        checkBox:SetScript("OnEnter",function()
+            displayFrame:SetAlpha(1)
+        end)
+
+        local text = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        text:SetPoint("LEFT", checkBox, "RIGHT", 5, 0)
+        text:SetText(taskData.text)
+        text:SetJustifyH("LEFT")
+
+        local deleteButton = CreateFrame("Button", "ToDoErDeleteButton" .. i, row)
+        deleteButton:SetSize(20, 20)
+        deleteButton:SetPoint("RIGHT", -5, 0)
+        deleteButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up")
+        deleteButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down")
+        deleteButton:SetHighlightTexture("Interface\\Buttons\\UI-Panel-Highlight")
+        deleteButton:SetScript("OnClick", function()
+            RemoveItem(i) 
+        end)
+        deleteButton:SetScript("OnEnter",function()
+            displayFrame:SetAlpha(1)
+        end)
+        
+        -- add the row to our tracking table and set it as the new anchor for the *next* row in the loop
+        table.insert(displayFrame.taskRows, row)
+        anchor = row
+    end
+end
 function AddItem(text)
     if text and text ~= "" then
         local taskData = {
@@ -127,7 +188,7 @@ function AddItem(text)
             lastChecked = 0
         }
         table.insert(ToDoErDB,taskData)
-        --UpdateList()
+        UpdateList()
         -- not yet implemented
     end
 end
@@ -169,6 +230,17 @@ end
 --     -- uncheck weekly checkboxes
 -- end
 
+--eventframe to update list when the addon is fully loaded
+local eventHandlerFrame = CreateFrame("Frame")
+eventHandlerFrame:RegisterEvent("ADDON_LOADED")
+eventHandlerFrame:SetScript("OnEvent", function(self, event, addonName)
+    if addonName == "ToDoEr" then 
+        print("ToDoEr has loaded. Drawing initial list.")
+        UpdateList()
+        self:UnregisterEvent("ADDON_LOADED")
+    end
+end)
+
 ---
 --- Slash Commands
 ---
@@ -186,6 +258,7 @@ end
 SLASH_TODOERRESET1 = "/tdereset"
 SlashCmdList["TODOERRESET"] = function()
     ToDoErDB = {}
+    UpdateList()
 end
 
 ---
