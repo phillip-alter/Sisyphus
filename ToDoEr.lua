@@ -292,9 +292,15 @@ function AddItem(text,isDaily,isWeekly)
         }
         if isDaily then
             taskData.daily = true
+            if not ToDoErDB.lastResetDayUTC then
+                ToDoErDB.lastResetDayUTC = tonumber(date("!%j",GetServerTime()))
+            end
         end
         if isWeekly then
             taskData.weekly = true
+            if not ToDoErDB.lastWeeklyReset then
+                ToDoErDB.lastWeeklyReset = GetServerTime()
+            end
         end
         table.insert(ToDoErDB,taskData)
         UpdateList()
@@ -348,7 +354,7 @@ local function ResetTasks(daily,weekly)
     end
 end
 
-local function DailyCheckReset()
+function DailyCheckReset()
     local resetHour = 0
     local region = GetCurrentRegion()
     if region == 1 then
@@ -368,6 +374,35 @@ local function DailyCheckReset()
     end
 end
 
+function WeeklyCheckReset()
+    local resetDay = 3 --tuesday
+    local resetHour = 0
+    local region = GetCurrentRegion()
+    if region == 1 then -- na
+        resetHour = 15
+    elseif region == 2 then -- eu
+        resetHour = 7
+    end
+    local currTime = GetServerTime()
+    if ToDoErDB.lastWeeklyReset == nil then
+        ToDoErDB.lastWeeklyReset = 0
+    end
+    local currUTCInfo = date("!*t", currTime)
+    local daysSinceReset = (currUTCInfo.wday - resetDay + 7) % 7
+    if daysSinceReset == 0 and currUTCInfo.hour < resetHour then
+        daysSinceReset = 7
+    end
+    local secondsInADay = 86400 -- (24 * 60 * 60)
+    local lastResetTimestamp = currTime 
+                             - (daysSinceReset * secondsInADay) -- Go back to the reset day
+                             - (currUTCInfo.hour * 3600 + currUTCInfo.min * 60 + currUTCInfo.sec) -- Go back to 00:00:00
+                             + (resetHour * 3600) -- Add hours to get to 15:00:00
+    if currTime >= lastResetTimestamp and ToDoErDB.lastWeeklyReset < lastResetTimestamp then
+        ResetTasks(false,true)
+        ToDoErDB.lastWeeklyReset = lastResetTimestamp
+    end
+end
+
 --eventframe 
 local eventHandlerFrame = CreateFrame("Frame")
 eventHandlerFrame:RegisterEvent("ADDON_LOADED")
@@ -375,6 +410,7 @@ eventHandlerFrame:SetScript("OnEvent", function(self, event, addonName)
     if addonName == "ToDoEr" then 
         print("ToDoEr has loaded. Drawing initial list.")
         DailyCheckReset()
+        WeeklyCheckReset()
         UpdateList()
         self:UnregisterEvent("ADDON_LOADED")
     end
@@ -404,6 +440,19 @@ SLASH_TODOREWIND1 = "/tderewindday"
 SlashCmdList["TODOREWIND"] = function()
     ToDoErDB.lastResetDayUTC = ToDoErDB.lastResetDayUTC - 1
     print("Rewound day! New day is : " .. ToDoErDB.lastResetDayUTC)
+end
+
+SLASH_TODOREWINDWEEK1 = "/tderewindweek"
+SlashCmdList["TODOREWINDWEEK"] = function(msg)
+    local cmd = strlower(msg)
+    if cmd == "reset" then
+        ToDoErDB.lastWeeklyReset = 0
+    elseif cmd == "lastweek" then
+        local secsWeek = 604800
+        local weekAgo = GetServerTime() - secsWeek
+        ToDoErDB.lastWeeklyReset = weekAgo
+    end
+    print("Rewound week! New week is : " .. ToDoErDB.lastWeeklyReset)
 end
 
 ---
