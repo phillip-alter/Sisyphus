@@ -20,12 +20,6 @@ if not ToDoErGlobalDB then
 end
 
 ---
---- Init Text 
----
-
-print("ToDoEr initialized. Used /todoer or /tde to open menu.")
-
----
 --- Frame Creation
 --- 
 
@@ -59,7 +53,7 @@ local textBox = CreateFrame("EditBox","TextAdd",listFrame,"InputBoxTemplate")
 textBox:SetSize(275,35)
 textBox:SetPoint("CENTER",listFrame.player,"TOP",0,-35)
 textBox:SetMovable(false)
-textBox:SetMaxLetters(15)
+textBox:SetMaxLetters(20)
 textBox:SetAutoFocus(false)
 
 local isDaily = CreateFrame("CheckButton","DailyCheck",listFrame,"UICheckButtonTemplate")
@@ -102,6 +96,8 @@ addButton:SetScript("OnClick",function()
     local text = textBox:GetText()
     AddItem(text,isDaily:GetChecked(),isWeekly:GetChecked())
     textBox:SetText("")
+    isDaily:SetChecked(false)
+    isWeekly:SetChecked(false)
 end)
 
 
@@ -129,7 +125,6 @@ if ToDoErDB.IsHidden == true then
 else
     displayFrame:Show()
 end
---displayFrame:SetResizable(true)
 displayFrame:SetAlpha(0.33)
 displayFrame:RegisterForDrag("LeftButton")
 displayFrame:SetScript("OnDragStart",function(self)
@@ -394,9 +389,9 @@ function WeeklyCheckReset()
     end
     local secondsInADay = 86400 -- (24 * 60 * 60)
     local lastResetTimestamp = currTime 
-                             - (daysSinceReset * secondsInADay) -- Go back to the reset day
-                             - (currUTCInfo.hour * 3600 + currUTCInfo.min * 60 + currUTCInfo.sec) -- Go back to 00:00:00
-                             + (resetHour * 3600) -- Add hours to get to 15:00:00
+                             - (daysSinceReset * secondsInADay) -- go back to the reset day
+                             - (currUTCInfo.hour * 3600 + currUTCInfo.min * 60 + currUTCInfo.sec) -- go back to 00:00:00
+                             + (resetHour * 3600) -- add hours to get to 15:00:00 (or 7:00:00 for EU)
     if currTime >= lastResetTimestamp and ToDoErDB.lastWeeklyReset < lastResetTimestamp then
         ResetTasks(false,true)
         ToDoErDB.lastWeeklyReset = lastResetTimestamp
@@ -408,7 +403,7 @@ local eventHandlerFrame = CreateFrame("Frame")
 eventHandlerFrame:RegisterEvent("ADDON_LOADED")
 eventHandlerFrame:SetScript("OnEvent", function(self, event, addonName)
     if addonName == "ToDoEr" then 
-        print("ToDoEr has loaded. Drawing initial list.")
+        print("ToDoEr initialized. Used /todoer or /tde to open menu.")
         DailyCheckReset()
         WeeklyCheckReset()
         UpdateList()
@@ -422,37 +417,52 @@ end)
 
 SLASH_TODOER1 = "/todoer"
 SLASH_TODOER2 = "/tde"
-SlashCmdList["TODOER"] = function()
-    if listFrame:IsShown() then
-        listFrame:Hide()
-    else
-        listFrame:Show()
+SlashCmdList["TODOER"] = function(msg)
+    local cmd = strlower(msg)
+    if cmd == "reset" then
+        ToDoErDB = {}
+        UpdateList()
+        print("ToDoEr: Cleaned out list!")
+    elseif cmd == "hide" then
+        ToDoErDB.IsHidden = true
+        displayFrame:Hide()
+    elseif cmd == "show" then
+        ToDoErDB.IsHidden = false
+        displayFrame:Show()
+    elseif cmd == "help" then
+        print("ToDoEr: /tde: open main window")
+        print("ToDoEr: /tde reset: clear everything out")
+        print("ToDoEr: /tde hide: hide list")
+        print("ToDoEr: /tde show: show list")
+    else    
+        if listFrame:IsShown() then
+            listFrame:Hide()
+        else
+            listFrame:Show()
+        end
     end
 end
 
-SLASH_TODOERRESET1 = "/tdereset"
-SlashCmdList["TODOERRESET"] = function()
-    ToDoErDB = {}
-    UpdateList()
-end
+-- SLASH_TODOERRESET1 = "/tdereset"
+-- SlashCmdList["TODOERRESET"] = function()
+--     ToDoErDB = {}
+--     UpdateList()
+-- end
 
-SLASH_TODOREWIND1 = "/tderewindday"
-SlashCmdList["TODOREWIND"] = function()
-    ToDoErDB.lastResetDayUTC = ToDoErDB.lastResetDayUTC - 1
-    print("Rewound day! New day is : " .. ToDoErDB.lastResetDayUTC)
-end
-
-SLASH_TODOREWINDWEEK1 = "/tderewindweek"
+SLASH_TODOREWINDWEEK1 = "/tderewind"
 SlashCmdList["TODOREWINDWEEK"] = function(msg)
     local cmd = strlower(msg)
-    if cmd == "reset" then
-        ToDoErDB.lastWeeklyReset = 0
-    elseif cmd == "lastweek" then
+    if cmd == "lastweek" then
         local secsWeek = 604800
         local weekAgo = GetServerTime() - secsWeek
         ToDoErDB.lastWeeklyReset = weekAgo
+    elseif cmd == "yesterday" then
+        ToDoErDB.lastResetDayUTC = ToDoErDB.lastResetDayUTC - 1
+    else
+        ToDoErDB.lastResetDayUTC = 0
+        ToDoErDB.lastWeeklyReset = 0
     end
-    print("Rewound week! New week is : " .. ToDoErDB.lastWeeklyReset)
+    print("ToDoEr: Rewound! Do a /reload to see changes.")
 end
 
 ---
