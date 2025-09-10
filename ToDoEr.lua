@@ -11,6 +11,10 @@ if not ToDoErDB then
     ToDoErDB = {}
 end
 
+if not ToDoErDB.IsHidden then
+    ToDoErDB.IsHidden = false
+end
+
 if not ToDoErGlobalDB then
     ToDoErGlobalDB = {}
 end
@@ -94,6 +98,11 @@ displayFrame.title:SetPoint("TOPLEFT",displayFrame.TitleBg,"TOPLEFT",5,-3)
 displayFrame.title:SetText("Tasks")
 displayFrame:EnableMouse(true)
 displayFrame:SetMovable(true)
+if ToDoErDB.IsHidden == true then
+    displayFrame:Hide()
+else
+    displayFrame:Show()
+end
 --displayFrame:SetResizable(true)
 displayFrame:SetAlpha(0.33)
 displayFrame:RegisterForDrag("LeftButton")
@@ -118,10 +127,26 @@ showButton:SetText("Show/Hide List")
 showButton:SetScript("OnClick", function()
     if not displayFrame:IsShown() then
         displayFrame:Show()
-        UpdateList()
+        ToDoErDB.IsHidden = false
     else 
         displayFrame:Hide()
+        ToDoErDB.IsHidden = true
     end
+end)
+
+local uncheckButton = CreateFrame("Button", "ToDoErUncheckButton", listFrame, "UIPanelButtonTemplate")
+uncheckButton:SetSize(110, 30)
+uncheckButton:SetPoint("RIGHT", showButton, "LEFT", -10, 0)
+uncheckButton:SetText("Uncheck All")
+uncheckButton:SetScript("OnClick", function()
+    UnCheckAll()
+end)
+uncheckButton:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    GameTooltip:SetText("Resets the checked status of all tasks on this character's list.", nil, nil, nil, nil, true)
+end)
+uncheckButton:SetScript("OnLeave", function()
+    GameTooltip:Hide()
 end)
 
 function UpdateList()
@@ -131,13 +156,13 @@ function UpdateList()
         row:Hide() 
     end
 
-    -- reset our tracking table
+    -- reset tracking table
     displayFrame.taskRows = {} 
 
-    --this is the UI element we will anchor the top of our list to.
+    --this is the UI element we will anchor the top of list to.
     local anchor = displayFrame.TitleBg
 
-    -- loop through our database and create a UI row for each task
+    -- loop through database and create a UI row for each task
     for i, taskData in ipairs(ToDoErDB) do
         local row = CreateFrame("Frame", "ToDoErTaskRow" .. i, displayFrame)
         row:SetSize(displayFrame:GetWidth() - 20, 25) 
@@ -201,9 +226,12 @@ function UpdateList()
             displayFrame:SetAlpha(1)
         end)
 
-        -- add the row to our tracking table and set it as the new anchor for the *next* row in the loop
+        -- add the row to tracking table and set it as the new anchor for the *next* row in the loop
         table.insert(displayFrame.taskRows, row)
         anchor = row
+    end
+    if ToDoErDB.IsHidden then
+        displayFrame:Hide()
     end
 end
 function AddItem(text)
@@ -215,7 +243,6 @@ function AddItem(text)
         }
         table.insert(ToDoErDB,taskData)
         UpdateList()
-        -- not yet implemented
     end
 end
 
@@ -245,7 +272,10 @@ function MoveDown(id)
 end
 
 function UnCheckAll()
-    -- set all items to unchecked
+    for _,taskData in ipairs(ToDoErDB) do
+        taskData.checked = false
+    end
+    UpdateList()
 end
 
 
