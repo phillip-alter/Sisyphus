@@ -194,9 +194,10 @@ function AddItem(text)
 end
 
 function RemoveItem(id)
-    -- remove item from pinned list
-    -- remove item from db
-    -- update frame
+    if id then
+        table.remove(ToDoErDB,id)
+    end
+    UpdateList()
 end
 
 function MoveUp()
