@@ -85,7 +85,7 @@ end)
 --- textbox (may or may not be editable)
 --- delete button
 --- up arrow to move up on list
---- down arrow to move down on list 
+--- down arrow to move down on list
 
 local displayFrame = CreateFrame("Frame","ListDisplayFrame",UIParent,"BasicFrameTemplateWithInset")
 displayFrame:SetWidth(250)
@@ -173,13 +173,6 @@ function UpdateList()
         checkBox:SetSize(25, 25)
         checkBox:SetPoint("LEFT", 5, 0)
         checkBox:SetChecked(taskData.checked)
-        checkBox:SetScript("OnClick", function(self)
-            -- when clicked, update the data in the database
-            taskData.checked = self:GetChecked()
-            taskData.lastChecked = time() -- current time
-            --testing purposes
-            --print("Task '" .. taskData.text .. "' checked status is now: " .. tostring(taskData.checked))
-        end)
         checkBox:SetScript("OnEnter",function()
             displayFrame:SetAlpha(1)
         end)
@@ -188,6 +181,24 @@ function UpdateList()
         text:SetPoint("LEFT", checkBox, "RIGHT", 5, 0)
         text:SetText(taskData.text)
         text:SetJustifyH("LEFT")
+        if checkBox:GetChecked() then
+            text:SetTextColor(0.5,0.5,0.5)
+        else 
+            text:SetTextColor(1,1,1)
+        end
+
+        checkBox:SetScript("OnClick", function(self)
+            -- when clicked, update the data in the database
+            taskData.checked = self:GetChecked()
+            taskData.lastChecked = time() -- current time
+            if self:GetChecked() then
+                text:SetTextColor(0.5,0.5,0.5)
+            else 
+                text:SetTextColor(1,1,1)
+            end
+            --testing purposes
+            --print("Task '" .. taskData.text .. "' checked status is now: " .. tostring(taskData.checked))
+        end)
 
         local deleteButton = CreateFrame("Button", "ToDoErDeleteButton" .. i, row)
         deleteButton:SetSize(20, 20)
@@ -233,7 +244,8 @@ function UpdateList()
         displayFrame:Hide()
     end
 end
-function AddItem(text)
+
+function AddItem(text,isDaily,isWeekly)
     if text and text ~= "" then
         local taskData = {
             text = text,
@@ -301,6 +313,7 @@ end
 --- * implement account-wide list
 --- ** possibly separate by categories
 --- * chillax for a min, idk
+--- * finished tasks go on bottom?
 
 --eventframe to update list when the addon is fully loaded
 local eventHandlerFrame = CreateFrame("Frame")
