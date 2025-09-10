@@ -327,6 +327,36 @@ end
 --- QOL Features
 ---
 
+local function ResetTasks(daily,weekly)
+    for _,taskData in ipairs(ToDoErDB) do
+        if taskData.daily and daily then
+            taskData.checked = false
+        elseif taskData.weekly and weekly then
+            taskData.checked = false
+        end
+    end
+end
+
+local function DailyCheckReset()
+    local resetHour = 0
+    local region = GetCurrentRegion()
+    if region == 1 then
+        resetHour = 15
+    elseif region == 2 then
+        resetHour = 7
+    end
+    local currTime = GetServerTime()
+    local currDay = tonumber(date("!%j",currTime))
+    local currHour = tonumber(date("!%H",currTime))
+    if ToDoErDB.lastResetDayUTC == nil then
+        ToDoErDB.lastResetDayUTC = 0
+    end
+    if currDay ~= ToDoErDB.lastResetDayUTC and currHour >= resetHour then
+       ResetTasks(true,false)
+       ToDoErDB.lastResetDayUTC = currDay
+    end
+end
+
 --Slash commands for adding/deleting/clearing task list
 
 -- local function NewDailyReset()
@@ -356,6 +386,10 @@ eventHandlerFrame:SetScript("OnEvent", function(self, event, addonName)
         print("ToDoEr has loaded. Drawing initial list.")
         UpdateList()
         self:UnregisterEvent("ADDON_LOADED")
+    end
+    if event == "PLAYER_LOGIN" then
+        DailyCheckReset()
+        --WeeklyCheckReset()
     end
 end)
 
