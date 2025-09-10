@@ -115,6 +115,9 @@ showButton:SetScript("OnClick", function()
     end
 end)
 
+function UpdateList()
+    --todo 
+end
 
 function AddItem(text)
     if text and text ~= "" then
@@ -150,10 +153,6 @@ function UnCheckAll()
 end
 
 
-function UpdateList()
-    --todo 
-end
-
 ---
 --- QOL Features
 ---
@@ -188,5 +187,9 @@ SLASH_TODOERRESET1 = "/tdereset"
 SlashCmdList["TODOERRESET"] = function()
     ToDoErDB = {}
 end
+
+---
+--- Designating special frames
+---
 
 table.insert(UISpecialFrames, "ToDoErFrame")
