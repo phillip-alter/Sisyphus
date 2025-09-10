@@ -30,7 +30,7 @@ print("ToDoEr initialized. Used /todoer or /tde to open menu.")
 --- 
 
 local listFrame = CreateFrame("Frame","ToDoErFrame",UIParent,"BasicFrameTemplateWithInset")
-listFrame:SetSize(350,200)
+listFrame:SetSize(350,275)
 listFrame:SetPoint("CENTER",UIParent,"CENTER",0,0)
 listFrame.TitleBg:SetHeight(30)
 listFrame.title = listFrame:CreateFontString(nil,"OVERLAY","GameFontHighlight")
@@ -62,10 +62,37 @@ textBox:SetMovable(false)
 textBox:SetMaxLetters(15)
 textBox:SetAutoFocus(false)
 
+local isDaily = CreateFrame("CheckButton","DailyCheck",listFrame,"UICheckButtonTemplate")
+isDaily:SetSize(25,25)
+isDaily:SetPoint("BOTTOMLEFT",textBox,"BOTTOMLEFT",0,-25)
+isDaily.text = isDaily:CreateFontString(nil,"OVERLAY","GameFontNormal")
+isDaily.text:SetPoint("RIGHT",isDaily,"RIGHT",35,1)
+isDaily.text:SetText("Daily")
+isDaily:SetChecked(false)
+
+local isWeekly = CreateFrame("CheckButton","WeeklyCheck",listFrame,"UICheckButtonTemplate")
+isWeekly:SetSize(25,25)
+isWeekly:SetPoint("BOTTOM",isDaily,"BOTTOM",0,-30)
+isWeekly.text = isWeekly:CreateFontString(nil,"OVERLAY","GameFontNormal")
+isWeekly.text:SetPoint("LEFT",isWeekly,"RIGHT",0,1)
+isWeekly.text:SetText("Weekly")
+isWeekly:SetChecked(false)
+
+isDaily:SetScript("OnClick", function(self)
+    if self:GetChecked() then
+        isWeekly:SetChecked(false)
+    end
+end)
+
+isWeekly:SetScript("OnClick", function(self)
+    if self:GetChecked() then
+        isDaily:SetChecked(false)
+    end
+end)
 
 local addButton = CreateFrame("Button","ToDoErAddButton",listFrame, "UIPanelButtonTemplate")
 addButton:SetSize(100,30)
-addButton:SetPoint("CENTER",textBox,0,-40)
+addButton:SetPoint("CENTER",textBox,0,-100)
 addButton:SetText("Add Task")
 addButton:SetScript("OnEnter", function(self)
     GameTooltip:SetOwner(self,"ANCHOR_RIGHT")
@@ -73,7 +100,7 @@ addButton:SetScript("OnEnter", function(self)
 end)
 addButton:SetScript("OnClick",function()
     local text = textBox:GetText()
-    AddItem(text)
+    AddItem(text,isDaily:GetChecked(),isWeekly:GetChecked())
     textBox:SetText("")
 end)
 
@@ -184,7 +211,7 @@ function UpdateList()
         if checkBox:GetChecked() then
             text:SetTextColor(0.5,0.5,0.5)
         else 
-            text:SetTextColor(1,1,1)
+            text:SetTextColor(1,0.82,0)
         end
 
         checkBox:SetScript("OnClick", function(self)
@@ -194,7 +221,7 @@ function UpdateList()
             if self:GetChecked() then
                 text:SetTextColor(0.5,0.5,0.5)
             else 
-                text:SetTextColor(1,1,1)
+                text:SetTextColor(1,0.82,0)
             end
             --testing purposes
             --print("Task '" .. taskData.text .. "' checked status is now: " .. tostring(taskData.checked))
@@ -252,6 +279,12 @@ function AddItem(text,isDaily,isWeekly)
             checked = false,
             lastChecked = 0
         }
+        if isDaily then
+            taskData.daily = true
+        end
+        if isWeekly then
+            taskData.weekly = true
+        end
         table.insert(ToDoErDB,taskData)
         UpdateList()
     end
