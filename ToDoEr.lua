@@ -357,30 +357,10 @@ local function DailyCheckReset()
     end
 end
 
---Slash commands for adding/deleting/clearing task list
-
--- local function NewDailyReset()
---     -- compare dates of checks to set time (ie next day at 10 AM PT)
---     -- uncheck daily checkboxes
--- end
-
--- local function NewWeeklyReset()
---     -- compare dates of checks to set time (Tuesday at 9 AM PT)
---     -- uncheck weekly checkboxes
--- end
-
----TODO:
---- * scroll bar for more tasks
---- * variable width/height?
---- * add checkbox for daily/weekly
---- * implement account-wide list
---- ** possibly separate by categories
---- * chillax for a min, idk
---- * finished tasks go on bottom?
-
---eventframe to update list when the addon is fully loaded
+--eventframe 
 local eventHandlerFrame = CreateFrame("Frame")
 eventHandlerFrame:RegisterEvent("ADDON_LOADED")
+eventHandlerFrame:RegisterEvent("PLAYER_LOGIN")
 eventHandlerFrame:SetScript("OnEvent", function(self, event, addonName)
     if addonName == "ToDoEr" then 
         print("ToDoEr has loaded. Drawing initial list.")
@@ -389,6 +369,7 @@ eventHandlerFrame:SetScript("OnEvent", function(self, event, addonName)
     end
     if event == "PLAYER_LOGIN" then
         DailyCheckReset()
+        print("(tde) Login. curr hour: " .. tonumber(date("!%H",GetServerTime())))
         --WeeklyCheckReset()
     end
 end)
@@ -418,3 +399,12 @@ end
 ---
 
 table.insert(UISpecialFrames, "ToDoErFrame")
+
+---TODO:
+--- * scroll bar for more tasks
+--- * variable width/height?
+--- * add checkbox for daily/weekly
+--- * implement account-wide list
+--- ** possibly separate by categories
+--- * chillax for a min, idk
+--- * finished tasks go on bottom?
