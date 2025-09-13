@@ -356,16 +356,20 @@ function DailyCheckReset()
         resetHour = 15
     elseif region == 2 then
         resetHour = 7
+    else 
+        resetHour = 15 -- fallthrough for now
     end
     local currTime = GetServerTime()
-    local currDay = tonumber(date("!%j",currTime))
-    local currHour = tonumber(date("!%H",currTime))
+    local currUTCInfo = date("!*t", currTime)
     if ToDoErDB.lastResetDayUTC == nil then
         ToDoErDB.lastResetDayUTC = 0
     end
-    if currDay ~= ToDoErDB.lastResetDayUTC and currHour >= resetHour then
+    -- reset day is yesterday, minus the current time (to get it to 00:00:00), plus the reset hour for the region
+    local lastResetDay = currTime - (86400) - (currUTCInfo.hour * 3600 + currUTCInfo.min * 60 + currUTCInfo.sec) + (resetHour * 3600)       
+    -- check if it's been longer than the last reset day, and also check if the last reset day in the DB is older than yesterday
+    if currTime >= lastResetDay and ToDoErDB.lastResetDayUTC < lastResetDay then
        ResetTasks(true,false)
-       ToDoErDB.lastResetDayUTC = currDay
+       ToDoErDB.lastResetDayUTC = lastResetDay
     end
 end
 
@@ -396,6 +400,7 @@ function WeeklyCheckReset()
         ResetTasks(false,true)
         ToDoErDB.lastWeeklyReset = lastResetTimestamp
     end
+    --print("lastResetTimestamp: " .. lastResetTimestamp .. " currTime: " .. currTime)
 end
 
 --eventframe 
@@ -405,7 +410,9 @@ eventHandlerFrame:SetScript("OnEvent", function(self, event, addonName)
     if addonName == "ToDoEr" then 
         print("ToDoEr initialized. Used /todoer or /tde to open menu.")
         DailyCheckReset()
+        --print("Daily check ran.")
         WeeklyCheckReset()
+        --print("Weekly check ran.")
         UpdateList()
         self:UnregisterEvent("ADDON_LOADED")
     end
