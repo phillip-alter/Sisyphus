@@ -475,7 +475,6 @@ table.insert(UISpecialFrames, "ToDoErFrame")
 ---TODO:
 --- * scroll bar for more tasks
 --- * variable width/height?
---- * add checkbox for daily/weekly
 --- * implement account-wide list
 --- ** possibly separate by categories
 --- * chillax for a min, idk
