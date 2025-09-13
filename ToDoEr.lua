@@ -207,11 +207,11 @@ function UpdateList()
             text:SetTextColor(0.5,0.5,0.5)
         else 
             if taskData.daily then 
-                text:SetTextColor(0.1,0.8,0.1)
+                text:SetTextColor(0,0.44,0.87)
             elseif taskData.weekly then
-                text:SetTextColor(0.8,0.1,0.8)
+                text:SetTextColor(0.65,0.25,1.0)
             else 
-                text:SetTextColor(1,0.82,0)
+                text:SetTextColor(0.1,0.8,0.1)
             end
         end
 
@@ -223,11 +223,11 @@ function UpdateList()
                 text:SetTextColor(0.5,0.5,0.5)
             else 
                 if taskData.daily then 
-                    text:SetTextColor(0.1,0.8,0.1)
+                    text:SetTextColor(0,0.44,0.87)
                 elseif taskData.weekly then
-                    text:SetTextColor(0.8,0.1,0.8)
+                    text:SetTextColor(0.65,0.25,1.0)
                 else 
-                    text:SetTextColor(1,0.82,0)
+                    text:SetTextColor(0.1,0.8,0.1)
                 end
             end
             --testing purposes
