@@ -1,12 +1,12 @@
 ## Interface: 110200
-## Title: ToDoEr
+## Title: Sisyphus
 ## Notes: A to-do list for your character.
 ## Author: CeedTheMediocre
 ## Version: 1.0.0
 ## RequiredDeps:
 ## X-Curse-Project-ID: 999999
-## SavedVariables: ToDoErGlobalDB
-## SavedVariablesPerCharacter: ToDoErDB
+## SavedVariables: SisyphusGlobalDB
+## SavedVariablesPerCharacter: SisyphusDB
 
 # Main
-ToDoEr.lua
+Sisyphus.lua
