@@ -2,6 +2,7 @@
 --- A simple task list creator for your character(s)
 --- by CeedTheMediocre
 --- https://twitch.tv/CeedTheMediocre
+--- https://github.com/phillip-alter
 
 ---
 --- DB Creation/Verification
@@ -9,15 +10,14 @@
 
 if not SisyphusDB then
     SisyphusDB = {}
-end
-
-if not SisyphusDB.IsHidden then
-    SisyphusDB.IsHidden = false
+    -- SisyphusDB.IsHidden = true
 end
 
 if not SisyphusGlobalDB then
     SisyphusGlobalDB = {}
 end
+
+-- print("db's init'd.")
 
 ---
 --- Frame Creation
@@ -44,6 +44,8 @@ end)
 listFrame.player = listFrame:CreateFontString(nil,"OVERLAY","GameFontNormal")
 listFrame.player:SetPoint("CENTER",listFrame,"TOP",0,-50)
 listFrame.player:SetText("Character: " .. UnitName("player") .. " (Level " .. UnitLevel("player") .. ")")
+
+-- print("ListFrame init'd.")
 
 ---
 --- Add Tasks
@@ -100,7 +102,7 @@ addButton:SetScript("OnClick",function()
     isWeekly:SetChecked(false)
 end)
 
-
+-- print("Daily, weekly, add init'd.")
 
 -- Frame for displaying tasks
 --- each item in frame:
@@ -122,6 +124,7 @@ displayFrame:EnableMouse(true)
 displayFrame:SetMovable(true)
 if SisyphusDB.IsHidden == true then
     displayFrame:Hide()
+    -- print("hiding at displayFrame!")
 else
     displayFrame:Show()
 end
@@ -141,17 +144,38 @@ displayFrame:SetScript("OnLeave",function(self)
 end)
 displayFrame.taskRows = {}
 
+-- print("Display init'd.")
+
+---
+--- Scroll frame
+--- 
+
+local scrollFrame = CreateFrame("ScrollFrame","DisplayScrollFrame",displayFrame,"UIPanelScrollFrameTemplate")
+scrollFrame:SetPoint("TOPLEFT",displayFrame.TitleBg,"BOTTOMLEFT",0,-5)
+scrollFrame:SetPoint("BOTTOMRIGHT",displayFrame,"BOTTOMRIGHT",-30,5)
+
+-- print("ScrollFrame init'd.")
+
+-- child frame for scroll
+local scrollChild = CreateFrame("Frame","ScrollChildFrame",scrollFrame)
+scrollChild:SetWidth(scrollFrame:GetWidth()+30)
+scrollChild:SetHeight(1) -- will be adjusted as items are added
+scrollFrame:SetScrollChild(scrollChild)
+
+-- print("ScrollChild init'd.")
+
 local showButton = CreateFrame("Button","SisyphusShowButton",listFrame, "UIPanelButtonTemplate")
 showButton:SetSize(110,30)
 showButton:SetPoint("BOTTOMRIGHT",listFrame,-10,10)
 showButton:SetText("Show/Hide List")
 showButton:SetScript("OnClick", function()
-    if not displayFrame:IsShown() then
-        displayFrame:Show()
-        SisyphusDB.IsHidden = false
-    else 
+    if displayFrame:IsShown() then
         displayFrame:Hide()
         SisyphusDB.IsHidden = true
+        --print("hiding at showButton!")
+    else 
+        displayFrame:Show()
+        SisyphusDB.IsHidden = false
     end
 end)
 
@@ -180,13 +204,13 @@ function UpdateList()
     -- reset tracking table
     displayFrame.taskRows = {} 
 
-    --this is the UI element we will anchor the top of list to.
-    local anchor = displayFrame.TitleBg
+    -- top of list anchors here
+    local anchor = scrollChild
 
     -- loop through database and create a UI row for each task
     for i, taskData in ipairs(SisyphusDB) do
-        local row = CreateFrame("Frame", "SisyphusTaskRow" .. i, displayFrame)
-        row:SetSize(displayFrame:GetWidth() - 20, 25) 
+        local row = CreateFrame("Frame", "SisyphusTaskRow" .. i, scrollChild)
+        row:SetSize(scrollChild:GetWidth() - 20, 25) 
         
         -- anchor the very first row to the title, and every row after that to the one that came before it.
         row:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -5)
@@ -273,8 +297,9 @@ function UpdateList()
         table.insert(displayFrame.taskRows, row)
         anchor = row
     end
-    if SisyphusDB.IsHidden then
+    if SisyphusDB.IsHidden == true then
         displayFrame:Hide()
+        --print("hiding at UpdateList!")
     end
 end
 
@@ -436,6 +461,7 @@ SlashCmdList["Sisyphus"] = function(msg)
     elseif cmd == "hide" then
         SisyphusDB.IsHidden = true
         displayFrame:Hide()
+        --print("hiding at slash command!")
     elseif cmd == "show" then
         SisyphusDB.IsHidden = false
         displayFrame:Show()

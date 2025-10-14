@@ -35,7 +35,9 @@
         "NUM_CHAT_WINDOWS",
         "ChatEdit_GetActiveWindow",
         "Add",
-        "PlayerName"
+        "PlayerName",
+        "UIParent",
+        "GameTooltip"
     ],
     "Lua.type.weakUnionCheck": true
 }
