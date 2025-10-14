@@ -196,10 +196,10 @@ end)
 
 function UpdateList()
     -- clear any old task rows that are currently displayed
-    for i, row in ipairs(displayFrame.taskRows) do
-        -- hide the frame so the game can clean it up
-        row:Hide() 
-    end
+    -- for i, row in ipairs(displayFrame.taskRows) do
+    --     -- hide the frame so the game can clean it up
+    --     row:Hide() 
+    -- end
 
     -- reset tracking table
     displayFrame.taskRows = {} 
@@ -479,6 +479,7 @@ SlashCmdList["Sisyphus"] = function(msg)
     end
 end
 
+--debug funcs
 SLASH_TODOREWINDWEEK1 = "/sisrewind"
 SlashCmdList["TODOREWINDWEEK"] = function(msg)
     local cmd = strlower(msg)
@@ -487,7 +488,7 @@ SlashCmdList["TODOREWINDWEEK"] = function(msg)
         local weekAgo = GetServerTime() - secsWeek
         SisyphusDB.lastWeeklyReset = weekAgo
     elseif cmd == "yesterday" then
-        SisyphusDB.lastResetDayUTC = SisyphusDB.lastResetDayUTC - 1
+        SisyphusDB.lastResetDayUTC = SisyphusDB.lastResetDayUTC - 86400
     else
         SisyphusDB.lastResetDayUTC = 0
         SisyphusDB.lastWeeklyReset = 0
