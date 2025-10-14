@@ -112,14 +112,10 @@ end)
 --- up arrow to move up on list
 --- down arrow to move down on list
 
-local displayFrame = CreateFrame("Frame","ListDisplayFrame",UIParent,"BasicFrameTemplateWithInset")
+local displayFrame = CreateFrame("Frame","ListDisplayFrame",UIParent)
 displayFrame:SetWidth(250)
 displayFrame:SetHeight(300)
 displayFrame:SetPoint("TOPLEFT",UIParent,"TOPLEFT",10,-150)
-displayFrame.TitleBg:SetHeight(30)
-displayFrame.title = displayFrame:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall")
-displayFrame.title:SetPoint("TOPLEFT",displayFrame.TitleBg,"TOPLEFT",5,-3)
-displayFrame.title:SetText("Tasks for " .. UnitName("player"))
 displayFrame:EnableMouse(true)
 displayFrame:SetMovable(true)
 if SisyphusDB.IsHidden == true then
@@ -128,7 +124,6 @@ if SisyphusDB.IsHidden == true then
 else
     displayFrame:Show()
 end
-displayFrame:SetAlpha(0.33)
 displayFrame:RegisterForDrag("LeftButton")
 displayFrame:SetScript("OnDragStart",function(self)
     self:StartMoving()
@@ -136,13 +131,16 @@ end)
 displayFrame:SetScript("OnDragStop",function(self)
     self:StopMovingOrSizing()
 end)
-displayFrame:SetScript("OnEnter",function(self)
-    self:SetAlpha(1)
-end)
-displayFrame:SetScript("OnLeave",function(self)
-    self:SetAlpha(0.33)
-end)
 displayFrame.taskRows = {}
+
+
+local backgroundFrame = CreateFrame("Frame","DisplayBackground",displayFrame,"BasicFrameTemplateWithInset")
+backgroundFrame:SetAllPoints(true)
+backgroundFrame.TitleBg:SetHeight(30)
+backgroundFrame.title = backgroundFrame:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall")
+backgroundFrame.title:SetPoint("TOPLEFT",backgroundFrame.TitleBg,"TOPLEFT",5,-3)
+backgroundFrame.title:SetText("Tasks for " .. UnitName("player"))
+
 
 -- print("Display init'd.")
 
@@ -151,8 +149,8 @@ displayFrame.taskRows = {}
 --- 
 
 local scrollFrame = CreateFrame("ScrollFrame","DisplayScrollFrame",displayFrame,"UIPanelScrollFrameTemplate")
-scrollFrame:SetPoint("TOPLEFT",displayFrame.TitleBg,"BOTTOMLEFT",0,-5)
-scrollFrame:SetPoint("BOTTOMRIGHT",displayFrame,"BOTTOMRIGHT",-30,5)
+scrollFrame:SetPoint("TOPLEFT",backgroundFrame.TitleBg,"BOTTOMLEFT",0,-5)
+scrollFrame:SetPoint("BOTTOMRIGHT",backgroundFrame,"BOTTOMRIGHT",-30,5)
 
 -- print("ScrollFrame init'd.")
 
@@ -196,10 +194,10 @@ end)
 
 function UpdateList()
     -- clear any old task rows that are currently displayed
-    -- for i, row in ipairs(displayFrame.taskRows) do
-    --     -- hide the frame so the game can clean it up
-    --     row:Hide() 
-    -- end
+    for i, row in ipairs(displayFrame.taskRows) do
+        -- hide the frame so the game can clean it up
+        row:Hide() 
+    end
 
     -- reset tracking table
     displayFrame.taskRows = {} 
@@ -211,7 +209,6 @@ function UpdateList()
     for i, taskData in ipairs(SisyphusDB) do
         local row = CreateFrame("Frame", "SisyphusTaskRow" .. i, scrollChild)
         row:SetSize(scrollChild:GetWidth() - 20, 25) 
-        
         -- anchor the very first row to the title, and every row after that to the one that came before it.
         row:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -5)
 
@@ -219,9 +216,6 @@ function UpdateList()
         checkBox:SetSize(25, 25)
         checkBox:SetPoint("LEFT", 5, 0)
         checkBox:SetChecked(taskData.checked)
-        checkBox:SetScript("OnEnter",function()
-            displayFrame:SetAlpha(1)
-        end)
 
         local text = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         text:SetPoint("LEFT", checkBox, "RIGHT", 5, 0)
@@ -263,11 +257,9 @@ function UpdateList()
         deleteButton:SetPoint("RIGHT", -5, 0)
         deleteButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up")
         deleteButton:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down")
+        row.delButton = deleteButton
         deleteButton:SetScript("OnClick", function()
             RemoveItem(i) 
-        end)
-        deleteButton:SetScript("OnEnter", function()
-            displayFrame:SetAlpha(1)
         end)
 
         local moveDownButton = CreateFrame("Button", "SisyphusDownButton" .. i, row)
@@ -275,11 +267,9 @@ function UpdateList()
         moveDownButton:SetPoint("RIGHT", deleteButton, "LEFT", 0, 0) 
         moveDownButton:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
         moveDownButton:SetPushedTexture("Interface\\Buttons\\UI-MinusButton-Down")
+        row.moveDownButton = moveDownButton
         moveDownButton:SetScript("OnClick", function()
             MoveDown(i)
-        end)
-        moveDownButton:SetScript("OnEnter", function()
-            displayFrame:SetAlpha(1)
         end)
 
         local moveUpButton = CreateFrame("Button", "SisyphusUpButton" .. i, row)
@@ -287,12 +277,11 @@ function UpdateList()
         moveUpButton:SetPoint("RIGHT", moveDownButton, "LEFT", 0, 0) 
         moveUpButton:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
         moveUpButton:SetPushedTexture("Interface\\Buttons\\UI-PlusButton-Down")
+        row.moveUpButton = moveUpButton
         moveUpButton:SetScript("OnClick", function()
             MoveUp(i)
         end)
-        moveUpButton:SetScript("OnEnter", function()
-            displayFrame:SetAlpha(1)
-        end)
+
         -- add the row to tracking table and set it as the new anchor for the *next* row in the loop
         table.insert(displayFrame.taskRows, row)
         anchor = row
@@ -302,6 +291,29 @@ function UpdateList()
         --print("hiding at UpdateList!")
     end
 end
+
+backgroundFrame:SetAlpha(0.2)
+
+displayFrame:SetScript("OnEnter",function(self)
+    backgroundFrame:SetAlpha(1)
+    for i,row in ipairs(displayFrame.taskRows) do
+        row.delButton:SetAlpha(1)
+        row.moveUpButton:SetAlpha(1)
+        row.moveDownButton:SetAlpha(1)
+    end
+end)
+displayFrame:SetScript("OnLeave",function(self)
+    C_Timer.After(0,function()
+        if not self:IsMouseOver() then
+            backgroundFrame:SetAlpha(0.2)
+        for i,row in ipairs(displayFrame.taskRows) do
+            row.delButton:SetAlpha(0.2)
+            row.moveUpButton:SetAlpha(0.2)
+            row.moveDownButton:SetAlpha(0.2)
+        end
+        end
+    end)
+end)
 
 function AddItem(text,isDaily,isWeekly)
     if text and text ~= "" then
@@ -503,9 +515,7 @@ end
 table.insert(UISpecialFrames, "SisyphusFrame")
 
 ---TODO:
---- * scroll bar for more tasks
 --- * variable width/height?
 --- * implement account-wide list
 --- ** possibly separate by categories
---- * chillax for a min, idk
 --- * finished tasks go on bottom?
