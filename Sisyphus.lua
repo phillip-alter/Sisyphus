@@ -134,13 +134,18 @@ end)
 displayFrame.taskRows = {}
 
 
-local backgroundFrame = CreateFrame("Frame","DisplayBackground",displayFrame,"BasicFrameTemplateWithInset")
+local backgroundFrame = CreateFrame("Frame","DisplayBackground",displayFrame,"BackdropTemplate")
+backgroundFrame:SetBackdrop({
+	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+	edgeSize = 16,
+	insets = { left = 4, right = 4, top = 4, bottom = 4 },
+})
+backgroundFrame:SetBackdropColor(0, 0, 0,0.5)
 backgroundFrame:SetAllPoints(true)
-backgroundFrame.TitleBg:SetHeight(30)
 backgroundFrame.title = backgroundFrame:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall")
-backgroundFrame.title:SetPoint("TOPLEFT",backgroundFrame.TitleBg,"TOPLEFT",5,-3)
+backgroundFrame.title:SetPoint("TOPLEFT",backgroundFrame,"TOPLEFT",5,-3)
 backgroundFrame.title:SetText("Tasks for " .. UnitName("player"))
-
 
 -- print("Display init'd.")
 
@@ -149,7 +154,7 @@ backgroundFrame.title:SetText("Tasks for " .. UnitName("player"))
 --- 
 
 local scrollFrame = CreateFrame("ScrollFrame","DisplayScrollFrame",displayFrame,"UIPanelScrollFrameTemplate")
-scrollFrame:SetPoint("TOPLEFT",backgroundFrame.TitleBg,"BOTTOMLEFT",0,-5)
+scrollFrame:SetPoint("TOPLEFT",backgroundFrame,"TOPLEFT",0,-15)
 scrollFrame:SetPoint("BOTTOMRIGHT",backgroundFrame,"BOTTOMRIGHT",-30,5)
 
 -- print("ScrollFrame init'd.")
@@ -306,11 +311,11 @@ displayFrame:SetScript("OnLeave",function(self)
     C_Timer.After(0,function()
         if not self:IsMouseOver() then
             backgroundFrame:SetAlpha(0.2)
-        for i,row in ipairs(displayFrame.taskRows) do
-            row.delButton:SetAlpha(0.2)
-            row.moveUpButton:SetAlpha(0.2)
-            row.moveDownButton:SetAlpha(0.2)
-        end
+            for i,row in ipairs(displayFrame.taskRows) do
+                row.delButton:SetAlpha(0.2)
+                row.moveUpButton:SetAlpha(0.2)
+                row.moveDownButton:SetAlpha(0.2)
+            end
         end
     end)
 end)

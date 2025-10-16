@@ -2,7 +2,7 @@
 ## Title: Sisyphus
 ## Notes: A to-do list for your characters.
 ## Author: CeedTheMediocre
-## Version: 1.5.0
+## Version: 1.5.5
 ## RequiredDeps:
 ## X-Curse-Project-ID: 1365316
 ## SavedVariables: SisyphusGlobalDB
