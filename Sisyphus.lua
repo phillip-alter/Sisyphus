@@ -329,9 +329,9 @@ function AddItem(text,isDaily,isWeekly)
         }
         if isDaily then
             taskData.daily = true
-            --if not SisyphusDB.lastResetDayUTC then
-            --    SisyphusDB.lastResetDayUTC = tonumber(date("!%j",GetServerTime()))
-            --end
+            if not SisyphusDB.lastResetDayUTC then
+               SisyphusDB.lastResetDayUTC = tonumber(date("!%j",GetServerTime()))
+            end
         end
         if isWeekly then
             taskData.weekly = true
@@ -407,9 +407,9 @@ function DailyCheckReset()
     end
     local currTime = GetServerTime()
     local currUTCInfo = date("!*t", currTime)
-    -- if SisyphusDB.lastResetDayUTC == nil then
-    --     SisyphusDB.lastResetDayUTC = 0
-    -- end
+    if SisyphusDB.lastResetDayUTC == nil then
+        SisyphusDB.lastResetDayUTC = 0
+    end
     local currResetDay = currTime - (currUTCInfo.hour * 3600 + currUTCInfo.min * 60 + currUTCInfo.sec) + (resetHour * 3600)
     -- reset day is yesterday, minus the current time (to get it to 00:00:00), plus the reset hour for the region
     -- local lastResetDay = currTime - (86400) - (currUTCInfo.hour * 3600 + currUTCInfo.min * 60 + currUTCInfo.sec) + (resetHour * 3600)
@@ -418,10 +418,11 @@ function DailyCheckReset()
     --print("last reset day is " .. lastResetDay)
     -- print("Next reset day is " .. nextResetDay)
     --print("Next reset is " .. date("!*t",nextResetDay))
-    if currTime > currResetDay then
+    if currTime > currResetDay or SisyphusDB.lastResetDayUTC < currResetDay then
         for _,taskData in ipairs(SisyphusDB) do
             if taskData.daily == true and taskData.lastChecked < currResetDay then
                 taskData.checked = false
+                SisyphusDB.lastResetDayUTC = currResetDay
             end
         end
     end
@@ -431,10 +432,16 @@ function WeeklyCheckReset()
     local resetDay = 3 --tuesday
     local resetHour = 0
     local region = GetCurrentRegion()
-    if region == 1 then -- na
+    if region == 1 then         -- 1 = US/Oceanic
         resetHour = 15
-    elseif region == 2 then -- eu
-        resetHour = 7
+    elseif region == 2 then     -- 2 = Europe
+        resetHour = 4
+    elseif region == 3 then     -- 3 = Korea
+        resetHour = 22
+    elseif region == 4 then     -- 4 = Taiwan
+        resetHour = 22
+    elseif region == 5 then     -- 5 = China
+        resetHour = 22
     end
     local currTime = GetServerTime()
     if SisyphusDB.lastWeeklyReset == nil then
@@ -522,9 +529,9 @@ SlashCmdList["TODOREWINDWEEK"] = function(msg)
         local weekAgo = GetServerTime() - secsWeek
         SisyphusDB.lastWeeklyReset = weekAgo
     elseif cmd == "yesterday" then
-        --SisyphusDB.lastResetDayUTC = SisyphusDB.lastResetDayUTC - 86400
+        SisyphusDB.lastResetDayUTC = SisyphusDB.lastResetDayUTC - 86400
     else
-        --SisyphusDB.lastResetDayUTC = 0
+        SisyphusDB.lastResetDayUTC = 0
         SisyphusDB.lastWeeklyReset = 0
     end
     print("Sisyphus: Rewound! Do a /reload to see changes.")
