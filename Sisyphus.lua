@@ -410,9 +410,11 @@ function DailyCheckReset()
     local lastResetDay = currTime - (86400) - (currUTCInfo.hour * 3600 + currUTCInfo.min * 60 + currUTCInfo.sec) + (resetHour * 3600)
     -- add a day to calc the next reset day
     local nextResetDay = lastResetDay + 86400
+    -- print("last reset day is " .. lastResetDay)
+    -- print("Next reset day is " .. nextResetDay)
     --print("Next reset is " .. date("!*t",nextResetDay))
     -- check if it's been longer than the last reset day, and also check if the last reset day in the DB is older than yesterday
-    if currTime >= nextResetDay and SisyphusDB.lastResetDayUTC < nextResetDay then
+    if SisyphusDB.lastResetDayUTC < nextResetDay then
        ResetTasks(true,false)
        SisyphusDB.lastResetDayUTC = nextResetDay
     end
@@ -455,7 +457,7 @@ eventHandlerFrame:SetScript("OnEvent", function(self, event, addonName)
     if addonName == "Sisyphus" then 
         print("Sisyphus initialized. Used /Sisyphus or /sis to open menu.")
         DailyCheckReset()
-        --print("Daily check ran.")
+        -- print("Daily check ran.")
         WeeklyCheckReset()
         --print("Weekly check ran.")
         UpdateList()
