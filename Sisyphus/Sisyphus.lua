@@ -418,7 +418,7 @@ function DailyCheckReset()
     --print("last reset day is " .. lastResetDay)
     -- print("Next reset day is " .. nextResetDay)
     --print("Next reset is " .. date("!*t",nextResetDay))
-    if currTime > currResetDay or SisyphusDB.lastResetDayUTC < currResetDay then
+    if currTime > currResetDay then -- or SisyphusDB.lastResetDayUTC < currResetDay then
         for _,taskData in ipairs(SisyphusDB) do
             if taskData.daily == true and taskData.lastChecked < currResetDay then
                 taskData.checked = false
