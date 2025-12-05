@@ -1,8 +1,8 @@
-## Interface: 110205
+## Interface: 110207
 ## Title: Sisyphus
 ## Notes: A to-do list for your characters.
 ## Author: CeedTheMediocre
-## Version: 1.5.5
+## Version: 1.5.6
 ## RequiredDeps:
 ## X-Curse-Project-ID: 1365316
 ## SavedVariables: SisyphusGlobalDB
